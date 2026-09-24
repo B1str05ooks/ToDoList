@@ -18,7 +18,7 @@ public class Task
 
 
     Task(int id, String title, String description, String category,
-         Priority priority, TaskStatus status, LocalDate dueDate, LocalDate createdDate)
+         Priority priority, TaskStatus status, LocalDate dueDate)
     {
         this.id = id;
         this.title = title;
