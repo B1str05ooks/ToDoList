@@ -1,5 +1,6 @@
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.*;
 
 public class TaskManager
 {
@@ -50,6 +51,91 @@ public class TaskManager
         return Collections.unmodifiableList(tasks);
     }
 
+    public List<Task> searchByKeyword(String keyword)
+    {
+        String lower = keyword.toLowerCase();
+
+        return tasks.stream().filter(task -> task.getTitle().toLowerCase().contains(lower)
+        || task.getDescription().toLowerCase().contains(lower) || task.getCategory().toLowerCase().contains(lower))
+                .collect(Collectors.toList());
+    }
+
+    public List<Task> filterByPriority(Priority priority)
+    {
+        return tasks.stream().filter(tasks->tasks.getPriority() == priority).collect(Collectors.toList());
+    }
+
+    public List<Task> filterByStatus(TaskStatus status)
+    {
+        return tasks.stream().filter(tasks ->tasks.getStatus() == status).collect(Collectors.toList());
+    }
+
+    public List<Task> filterByCategory(String category)
+    {
+        return tasks.stream().filter(tasks -> tasks.getCategory().equalsIgnoreCase(category)).collect(Collectors.toList());
+
+    }
+
+
+    /* SORT
+    _______________________________________________________________________
+     */
+
+    public List<Task> sortByPriority()
+    {
+        return tasks.stream().sorted(Comparator.
+                comparingInt(tasks -> tasks.getPriority().getLevel())).collect(Collectors.toList());
+    }
+
+    public List<Task> sortByDueDate()
+    {
+        return tasks.stream().filter(tasks->tasks.getDueDate() != null)
+                .sorted(Comparator.comparing(Task::getDueDate))
+                .collect(Collectors.toList());
+    }
+
+    public List<Task> sortByStatus()
+    {
+        return tasks.stream().
+                sorted(Comparator.comparing(tasks-> tasks.getStatus().name())).
+                collect(Collectors.toList());
+    }
+
+    // Stats
+
+    public int totalTasks() { return tasks.size();}
+
+    public int pendingTasks()
+    {
+        return (int) tasks.stream().filter(tasks->tasks.getStatus() == TaskStatus.PENDING).count();
+
+    }
+
+    public int completedTask()
+    {
+        return (int) tasks.stream().filter(tasks->tasks.getStatus() == TaskStatus.COMPLETED).count();
+    }
+
+    public int overdueTasks()
+    {
+        return (int) tasks.stream().filter(tasks->tasks.getDueDate() != null
+                && tasks.getDueDate().isBefore(LocalDate.now())
+                && tasks.getStatus() != TaskStatus.COMPLETED).count();
+    }
+
+    //Loading tasks from file
+    public void setTasks(List<Task> loaded, int maxId)
+    {
+        tasks.clear();
+
+        tasks.addAll(loaded);
+
+        this.nextID = maxId + 1;
+    }
+
+
+
+    
 
 
 
